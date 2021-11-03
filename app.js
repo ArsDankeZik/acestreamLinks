@@ -8,7 +8,7 @@ const path = require("path");
 const sound = require("sound-play");
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
 const VOL = 0.2; // Controla el volumen de los sonidos !sonido
-const VERSION = 1.2;
+const VERSION = 1.2.0;
 
 const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: 'info'},
@@ -93,7 +93,7 @@ client.on('message', (channel, tags, message, self) => {
                 `);
             client.say(channel, 
                 `
-                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista
+                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista (mod, vip, sub)||
                 !tts: leerá tu mensaje por voz [beta] (mod, vip, sub) || 
                 !ttsinsulto: leerá por voz un mensaje aleatorio (mod, vip, sub) 
                 `);
