@@ -101,9 +101,11 @@ client.on('message', (channel, tags, message, self) => {
     };
 });
 
+/*
 client.on('resub', (channel, username, months, message, userstate, methos) => {
     client.say(channel, `¡El cabronazo de ${username} lleva ya ${months} meses suscrito!`);
 });
+*/
 
 // addOrSubMinutes(-120)
 // addOrSubMinutes(120)
