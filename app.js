@@ -7,6 +7,7 @@ const moment = require('moment');
 const path = require("path");
 const sound = require("sound-play");
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
+const VERSION = 1.0;
 
 const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: 'info'},
