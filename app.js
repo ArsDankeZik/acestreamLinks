@@ -8,7 +8,7 @@ const path = require("path");
 const sound = require("sound-play");
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
 const VOL = 0.2; // Controla el volumen de los sonidos !sonido
-const VERSION = 1.2.0;
+const VERSION = '1.2.1';
 
 const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: 'info'},
