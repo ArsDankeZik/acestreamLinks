@@ -7,7 +7,7 @@ const moment = require('moment');
 const path = require("path");
 const sound = require("sound-play");
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
-const VERSION = 1.0;
+const VERSION = 1.1;
 
 const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: 'info'},
@@ -48,7 +48,6 @@ client.on('message', (channel, tags, message, self) => {
     if(message.toLocaleLowerCase().includes('!sonido')){
         msg = message.replace('!sonido', '').trim();
         onlySubsAllowed(tags) ? 
-            // talkToMe(`${tags.username} dice ${pickRandom(insultos)}`) : 
             playSound(`${msg}`) : 
             client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
     }
