@@ -291,7 +291,6 @@ const insultos = [
     'Disculpa pero tengo cosas mejores con las que perder el tiempo.',
     'Eres tan brillante como un agujero negro y el doble de denso.',
     'No tengo una respuesta apropiada para alguien de tu edad mental.',
-    'Espero que el resto de tu día sea tan agradable como tú.',
     'Hay 7 trillones de nervios en el cuerpo humano, y tú irritas todos.',
     'La envidia es una enfermedad. Espero que te mejores.',
     'La gente feliz no tiene necesidad de amargar a los demás.',
