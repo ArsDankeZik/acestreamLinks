@@ -7,6 +7,7 @@ const moment = require('moment');
 const path = require("path");
 const sound = require("sound-play");
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
+const VOL = 0.2; // Controla el volumen de los sonidos !sonido
 const VERSION = 1.2;
 
 const client = new tmi.Client({
@@ -88,8 +89,11 @@ client.on('message', (channel, tags, message, self) => {
                 !rango: te dirá qué tipo de miembro eres en la comunidad || 
                 !creador: devolverá el nombre del creador del bot || 
                 !dado: tirará un dado por ti ||
-                !hora [ES, RO, RU, AR, CO]: devuelve la hora en estos países y sus diferentes zonas ||
-                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista ||
+                !hora [ES, RO, RU, AR, CO]: devuelve la hora en estos países y sus diferentes zonas
+                `);
+            client.say(channel, 
+                `
+                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista
                 !tts: leerá tu mensaje por voz [beta] (mod, vip, sub) || 
                 !ttsinsulto: leerá por voz un mensaje aleatorio (mod, vip, sub) 
                 `);
@@ -173,16 +177,15 @@ function onlySubsAllowed(tags){
  
 
 function playSound(w){
-    const vol = 0.2;
-    if(w === 'bofeton') sound.play(path.join(__dirname, "sounds/bofetón.mp3"), vol);
-    if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), vol);
-    if(w === 'pedo') sound.play(path.join(__dirname, "sounds/pedo_normal.mp3"), vol);
-    if(w === 'pedomojado') sound.play(path.join(__dirname, "sounds/pedo_mojado.mp3"), vol);
-    if(w === 'sorpresa') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), vol);
-    if(w === 'aplausos') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), vol);
-    if(w === 'gota') sound.play(path.join(__dirname, "sounds/gota.mp3"), vol);
-    if(w === 'aplausos niños') sound.play(path.join(__dirname, "sounds/aplausosniños.mp3"), vol);
-    if(w === 'suspense') sound.play(path.join(__dirname, "sounds/suspense.mp3"), vol);
+    if(w === 'bofeton') sound.play(path.join(__dirname, "sounds/bofetón.mp3"), VOL);
+    if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), VOL);
+    if(w === 'pedo') sound.play(path.join(__dirname, "sounds/pedo_normal.mp3"), VOL);
+    if(w === 'pedomojado') sound.play(path.join(__dirname, "sounds/pedo_mojado.mp3"), VOL);
+    if(w === 'sorpresa') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), VOL);
+    if(w === 'aplausos') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), VOL);
+    if(w === 'gota') sound.play(path.join(__dirname, "sounds/gota.mp3"), VOL);
+    if(w === 'aplausos niños') sound.play(path.join(__dirname, "sounds/aplausosniños.mp3"), VOL);
+    if(w === 'suspense') sound.play(path.join(__dirname, "sounds/suspense.mp3"), VOL);
 }
 
 function dimeMiRango(badge){
