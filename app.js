@@ -4,11 +4,20 @@ const iconv = require('iconv-lite');
 const proc = require('child_process');
 const ct = require('countries-and-timezones');
 const moment = require('moment');
-const path = require("path");
-const sound = require("sound-play");
+const path = require('path');
+const sound = require('sound-play');
+var gtts = require('node-gtts')('es');
+// Variables para el programa
+var filepath = path.join(__dirname, 'prueba.wav');
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
 const VOL = 0.2; // Controla el volumen de los sonidos !sonido
-const VERSION = '1.2.2';
+const VERSION = '1.2.3';
+var magicNumber = getRandInt(1, 50);
+var previousNumber = -1;
+var OBJECT_PEOPLE_LIFES = {};
+console.log(magicNumber);
+
+// LINK PARA HACER IMPLEMENTAR CANJEAR POR PUNTOS https://www.twitch.tv/videos/806178796?collection=E1yJPFFiSBZBrQ
 
 const client = new tmi.Client({
     options: { debug: true, messagesLogLevel: 'info'},
@@ -24,6 +33,11 @@ const client = new tmi.Client({
 });
 
 
+function googleTalkToMe(text){
+    gtts.save(filepath, text, () => {
+        sound.play(path.join(__dirname, "prueba.wav"), VOL);
+    });
+}
 
 client.connect().catch(console.error);
 
@@ -32,19 +46,53 @@ client.on('message', (channel, tags, message, self) => {
     if(tags.username.toLowerCase() === 'streamelements') return;
     // console.log(tags);
 
-    if(message.toLocaleLowerCase().includes('!tts') && !message.toLocaleLowerCase().includes('!ttsinsulto')){
-        msg = message.replace('!tts', '');
-        onlySubsAllowed(tags) ? 
-            talkToMe(`${tags.username} dice ${msg}`) : 
-            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
-    }
-
+    
     if(message.toLocaleLowerCase().includes('!ttsinsulto')){
         msg = message.replace('!ttsinsulto', '');
         onlySubsAllowed(tags) ? 
             talkToMe(`${tags.username} dice ${pickRandom(insultos)}`) : 
             client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
     }
+
+    if(message.toLocaleLowerCase().includes('!ttspiropo')){
+        // console.log(message);
+        msg = message.replace('!ttspiropo', '');
+        onlySubsAllowed(tags) ? 
+            talkToMe(`${tags.username} dice ${pickRandom(piropos)}`) : 
+            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
+    }
+
+    if(message.toLocaleLowerCase().includes('!tts') && !message.toLocaleLowerCase().includes('v2') && !message.toLocaleLowerCase().includes('!ttsinsulto') && !message.toLocaleLowerCase().includes('!ttspiropo')){
+        // console.log(message);    
+        msg = message.replace('!tts', '');
+        onlySubsAllowed(tags) ? 
+            talkToMe(`${tags.username} dice ${msg}`) : 
+            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
+    }
+
+    if(message.toLocaleLowerCase().includes('!ttsinsultov2')){
+        msg = message.replace('!ttsinsultov2', '');
+        onlySubsAllowed(tags) ? 
+            googleTalkToMe(`${tags.username} dice ${pickRandom(insultos)}`) : 
+            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
+    }
+
+    if(message.toLocaleLowerCase().includes('!ttspiropov2')){
+        // console.log(message);
+        msg = message.replace('!ttspiropov2', '');
+        onlySubsAllowed(tags) ? 
+            googleTalkToMe(`${tags.username} dice ${pickRandom(piropos)}`) : 
+            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
+    }
+
+    if(message.toLocaleLowerCase().includes('!ttsv2') && !message.toLocaleLowerCase().includes('!ttsinsulto') && !message.toLocaleLowerCase().includes('!ttspiropo')){
+        // console.log(message);    
+        msg = message.replace('!ttsv2', '');
+        onlySubsAllowed(tags) ? 
+            googleTalkToMe(`${tags.username} dice ${msg}`) : 
+            client.say(channel, `@${tags.username} no tienes permitido realizar esta acción`);
+    }
+
 
     if(message.toLocaleLowerCase().includes('!sonido')){
         msg = message.replace('!sonido', '').trim();
@@ -57,6 +105,20 @@ client.on('message', (channel, tags, message, self) => {
         msg = message.replace('!hora', '').trim();
         console.log(msg);
         client.say(channel, `${calculateHour(msg.toUpperCase())}`);
+    }
+
+    if(message.toLocaleLowerCase().includes('!adivinaelnr')){
+        msg = message.replace('!adivinaelnr', '').trim();
+        client.say(channel, `${takeAGuess(msg, tags.username)}`);
+    }
+
+    if(message.toLowerCase().includes('!rvidas')){
+        msg = message.replace('!rvidas', '').trim();
+        if(tags.badges != null && tags.badges != undefined && (tags.badges.hasOwnProperty('broadcaster') || tags.username == 'noctismaiestatem')){
+            console.log(msg);
+            if(!msg || msg.length == 0) client.say(channel, `El comando es !rvidas usuario`);
+            else client.say(channel, `${registerUserAndCount(msg, 'reset')}`);
+        }
     }
     
     switch(message.toLowerCase()){
@@ -78,6 +140,13 @@ client.on('message', (channel, tags, message, self) => {
         case '!dado':
             client.say(channel, `Has sacado un, ${dado()}`);
             break;
+        case '!vidas':
+            client.say(channel, `${registerUserAndCount(tags.username)}`);
+            break;
+        case '!mostrarnr':
+            if(tags.badges != null && tags.badges != undefined && (tags.badges.hasOwnProperty('broadcaster') || tags.username == 'noctismaiestatem'))
+                client.say(channel, `El número es ${magicNumber}`);
+            break;
         case '!creador':
             client.say(channel, 'El nombre de mi creador es @noctismaiestatem (twitch.tv/noctismaiestatem)');
             break;
@@ -93,19 +162,68 @@ client.on('message', (channel, tags, message, self) => {
                 `);
             client.say(channel, 
                 `
-                !sonido [bofeton, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista (mod, vip, sub)||
+                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista (mod, vip, sub)||
                 !tts: leerá tu mensaje por voz [beta] (mod, vip, sub) || 
-                !ttsinsulto: leerá por voz un mensaje aleatorio (mod, vip, sub) 
+                !ttsinsulto: leerá por voz un insulto aleatorio (mod, vip, sub) ||
+                !ttspiropo: leerá por voz un piropo aleatorio (mod, vip, sub) ||
+                !adivinaelnr [1, 2...50]: mini juego de adivinar el número con 6 vidas ||
+                !vidas: te muestra las vidas que te quedan ||
+                !rvidas [usuario]: te resetea la vida (solo el fundador y @NoctisMaiestatem) ||
+                !mostrarnr: muestra el número a adivinar (solo el fundador y @NoctisMaiestatem)
                 `);
             break;
     };
 });
 
-/*
-client.on('resub', (channel, username, months, message, userstate, methos) => {
-    client.say(channel, `¡El cabronazo de ${username} lleva ya ${months} meses suscrito!`);
-});
-*/
+// client.on('resub', (channel, username, months, message, userstate, methos) => {
+//     client.say(channel, `¡El cabronazo de ${username} lleva ya ${months} meses suscrito!`);
+// });
+
+function registerUserAndCount(name, opt){
+    const totalLifes = 6;
+
+    if(!OBJECT_PEOPLE_LIFES.hasOwnProperty(name)) OBJECT_PEOPLE_LIFES[name] = totalLifes;
+    if(OBJECT_PEOPLE_LIFES[name] == 0) return false;
+
+    if(opt === 'rest') OBJECT_PEOPLE_LIFES[name] -= 1;
+    if(opt === 'sum') OBJECT_PEOPLE_LIFES[name] += 1;
+    if(opt === 'reset' && OBJECT_PEOPLE_LIFES.hasOwnProperty(name)) OBJECT_PEOPLE_LIFES[name] = totalLifes;
+
+    return `Te quedan ${OBJECT_PEOPLE_LIFES[name]}`;
+}
+
+// @TODO: En un futuro añadir 3 vidas y cuando se acaben ya no poder jugar más en ese stream
+// Eso supondrá que necesitaremos otra función que devuelvan las vidas de cada uno de los usuarios
+function takeAGuess(nr, name){
+    const min = 1;
+    const max = 50;
+    const errMessage = `Tienes que introducir un número entre el ${min} y el ${max}`;
+    nr = parseInt(nr); 
+    console.log(`El usuario ha introducido: ${nr}`);
+
+    if(!nr) return errMessage;
+    if(nr > max) return errMessage;
+    if(nr < min) return errMessage;
+    if(registerUserAndCount(name) == false) return `@${name} has muerto en una feroz batalla, más suerte la próxima vez, máquina.`;
+
+    if(nr == magicNumber) {
+        previousNumber = magicNumber;
+        do {
+            magicNumber=getRandInt(min, max);
+        } while (magicNumber == previousNumber);
+        console.log(`El nuevo número que se ha generado es el ${magicNumber}`);
+        registerUserAndCount(name, 'sum');
+        talkToMe(`${name} ha ganado un pin por adivinar el número ${previousNumber}`);
+        return `Efectivamente, el número era ${previousNumber}. ¡Has ganado un pin!`;
+    }
+
+    registerUserAndCount(name, 'rest');
+    return 'Más suerte a la próxima';
+}
+
+function getRandInt(minimum, maximum) {
+    return Math.floor(Math.random() * (maximum - minimum)) + minimum;
+}
 
 // addOrSubMinutes(-120)
 // addOrSubMinutes(120)
@@ -180,7 +298,7 @@ function onlySubsAllowed(tags){
 
 function playSound(w){
     if(w === 'bofeton') sound.play(path.join(__dirname, "sounds/bofetón.mp3"), VOL);
-    //if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), VOL);
+    if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), VOL);
     if(w === 'pedo') sound.play(path.join(__dirname, "sounds/pedo_normal.mp3"), VOL);
     if(w === 'pedomojado') sound.play(path.join(__dirname, "sounds/pedo_mojado.mp3"), VOL);
     if(w === 'sorpresa') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), VOL);
@@ -197,6 +315,20 @@ function dimeMiRango(badge){
     });
 
     return `Rango/s: ${str}`;
+}
+
+function pickRandom(arr){
+    const min = 0;
+    const max = arr ? arr.length : 0;
+    const rand = (Math.floor(Math.pow(10,14)*Math.random()*Math.random())%(max-min+1))+min;
+    return arr[rand];
+}
+
+function dado(){
+    const min = 1;
+    const max = 6;
+    const rand = (Math.floor(Math.pow(10,14)*Math.random()*Math.random())%(max-min+1))+min;
+    return rand;
 }
 
 const piropos = [
@@ -293,6 +425,7 @@ const insultos = [
     'Disculpa pero tengo cosas mejores con las que perder el tiempo.',
     'Eres tan brillante como un agujero negro y el doble de denso.',
     'No tengo una respuesta apropiada para alguien de tu edad mental.',
+    'Espero que el resto de tu día sea tan agradable como tú.',
     'Hay 7 trillones de nervios en el cuerpo humano, y tú irritas todos.',
     'La envidia es una enfermedad. Espero que te mejores.',
     'La gente feliz no tiene necesidad de amargar a los demás.',
@@ -323,16 +456,3 @@ const insultos = [
     'Tu rostro es como febrero, lleno de escarcha, tormentas y nubosidad.'
 ];
 
-function pickRandom(arr){
-    const min = 0;
-    const max = arr ? arr.length : 0;
-    const rand = (Math.floor(Math.pow(10,14)*Math.random()*Math.random())%(max-min+1))+min;
-    return arr[rand];
-}
-
-function dado(){
-    const min = 1;
-    const max = 6;
-    const rand = (Math.floor(Math.pow(10,14)*Math.random()*Math.random())%(max-min+1))+min;
-    return rand;
-}
