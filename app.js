@@ -11,7 +11,7 @@ var gtts = require('node-gtts')('es');
 var filepath = path.join(__dirname, 'prueba.wav');
 const SUBS = true; // CONSTANTE GLOBAL PARA HABILITAR CIERTOS COMANDOS SOLO PARA SUBS/VIPS/MODS
 const VOL = 0.2; // Controla el volumen de los sonidos !sonido
-const VERSION = '1.2.3';
+const VERSION = '1.2.4';
 var magicNumber = getRandInt(1, 50);
 var previousNumber = -1;
 var OBJECT_PEOPLE_LIFES = {};
@@ -154,7 +154,7 @@ client.on('message', (channel, tags, message, self) => {
             client.say(channel, 
                 `
                 !insulto: te devolverá un insulto rándom || 
-                !piropo: leerá por voz un mensaje aleatorio || 
+                !piropo: leerá por voz un piropo aleatorio || 
                 !rango: te dirá qué tipo de miembro eres en la comunidad || 
                 !creador: devolverá el nombre del creador del bot || 
                 !dado: tirará un dado por ti ||
@@ -162,7 +162,7 @@ client.on('message', (channel, tags, message, self) => {
                 `);
             client.say(channel, 
                 `
-                !sonido [bofeton, gemido, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista (mod, vip, sub)||
+                !sonido [bofeton, pedo, pedomojado, sorpresa, aplausos, gota, aplausos niños, suspense]: reproduce uno de los sonidos de la lista (mod, vip, sub)||
                 !tts: leerá tu mensaje por voz [beta] (mod, vip, sub) || 
                 !ttsinsulto: leerá por voz un insulto aleatorio (mod, vip, sub) ||
                 !ttspiropo: leerá por voz un piropo aleatorio (mod, vip, sub) ||
@@ -298,7 +298,7 @@ function onlySubsAllowed(tags){
 
 function playSound(w){
     if(w === 'bofeton') sound.play(path.join(__dirname, "sounds/bofetón.mp3"), VOL);
-    if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), VOL);
+    // if(w === 'gemido') sound.play(path.join(__dirname, "sounds/gemido.mp3"), VOL);
     if(w === 'pedo') sound.play(path.join(__dirname, "sounds/pedo_normal.mp3"), VOL);
     if(w === 'pedomojado') sound.play(path.join(__dirname, "sounds/pedo_mojado.mp3"), VOL);
     if(w === 'sorpresa') sound.play(path.join(__dirname, "sounds/sorpresa_aplausos.mp3"), VOL);
